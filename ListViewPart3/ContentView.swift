@@ -4,14 +4,18 @@ import SwiftUI
 struct PersonModel: Identifiable {
     let id = UUID()
     let name: String
+    var check: Bool
 }
 
 class People: ObservableObject {
     @Published var people = [
-        PersonModel(name: "さとう"),
-        PersonModel(name: "すずき"),
-        PersonModel(name: "たなか")
+        PersonModel(name: "さとう", check: true),
+        PersonModel(name: "すずき", check: false),
+        PersonModel(name: "たなか", check: true)
     ]
+    func delete(offsets: IndexSet) {
+        self.people.remove(atOffsets: offsets)
+    }
 }
 
 struct ContentView: View {
@@ -20,19 +24,36 @@ struct ContentView: View {
         VStack {
             List {
                 ForEach(students.people) { person in
-                    Text(person.name)
+                    ListRaw(person: person)
                 }
-                .onDelete(perform: delete)
+                .onDelete(perform: students.delete)
             }
             Button(action: {
                 print(students.people)
             }) {
-                Text("解析")
+                Text("解析する")
             }
         }
     }
-    func delete(offsets: IndexSet) {
-        students.people.remove(atOffsets: offsets)
+}
+
+struct ListRaw: View {
+    @State var person: PersonModel
+    var body: some View {
+        VStack {
+            Button(action: {
+                person.check.toggle()
+            }) {
+                if person.check {
+                    Text(person.name)
+                        .foregroundColor(.red)
+                }
+                else {
+                    Text(person.name)
+                        .foregroundColor(.blue)
+                }
+            }
+        }
     }
 }
 
