@@ -1,21 +1,38 @@
-//
-//  ContentView.swift
-//  ListViewPart3
-//
-//  Created by 渡邊魁優 on 2023/02/03.
-//
 
 import SwiftUI
 
+struct PersonModel: Identifiable {
+    let id = UUID()
+    let name: String
+}
+
+class People: ObservableObject {
+    @Published var people = [
+        PersonModel(name: "さとう"),
+        PersonModel(name: "すずき"),
+        PersonModel(name: "たなか")
+    ]
+}
+
 struct ContentView: View {
+    @ObservedObject private var students = People()
     var body: some View {
         VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundColor(.accentColor)
-            Text("Hello, world!")
+            List {
+                ForEach(students.people) { person in
+                    Text(person.name)
+                }
+                .onDelete(perform: delete)
+            }
+            Button(action: {
+                print(students.people)
+            }) {
+                Text("解析")
+            }
         }
-        .padding()
+    }
+    func delete(offsets: IndexSet) {
+        students.people.remove(atOffsets: offsets)
     }
 }
 
